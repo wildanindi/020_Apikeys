@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Manajemen Database</title>
+    <style>
+        /* ... Style CSS Anda yang lama ... */
+        /* Tambahkan sedikit style untuk link admin */
+        .admin-link {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+        .admin-link a { color: #63b3ed; text-decoration: none; }
+        .admin-link a:hover { text-decoration: underline; }
+        
+        /* Style dasar lainnya sama... */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1a202c; color: #fff; display: flex; justify-content: center; padding: 2rem 0; }
+        .container { background-color: #2d3748; padding: 2rem; border-radius: 12px; width: 90%; max-width: 500px; }
+        h2 { border-bottom: 2px solid #4a5568; padding-bottom: 10px; margin-bottom: 20px; color: #63b3ed; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #cbd5e0; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #4a5568; background-color: #1a202c; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-blue { background-color: #3182ce; }
+        .btn-green { background-color: #38a169; }
+        .message { margin-top: 10px; padding: 10px; border-radius: 5px; display: none; }
+        .success { background-color: #c6f6d5; color: #22543d; display: block; }
+        .error { background-color: #fed7d7; color: #822727; display: block; }
+        .section { margin-bottom: 40px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="section">
+        <h2>1. Registrasi User</h2>
+        <p style="color: #a0aec0; font-size: 0.9rem;">Data masuk ke tabel: <code>user</code></p>
+
+        <label>First Name (Wajib)</label>
+        <input type="text" id="uFirst" placeholder="Contoh: Wildan">
+        
+        <label>Last Name (Opsional)</label>
+        <input type="text" id="uLast" placeholder="Contoh: Indi">
+        
+        <label>Email User (Wajib)</label>
+        <input type="email" id="uEmail" placeholder="wildan@gmail.com">
+        
+        <button id="regUserBtn" class="btn-green">Daftar User</button>
+        <div id="userMsg" class="message"></div>
+    </div>
+
+    <div class="section">
+        <h2>2. API Key Manager</h2>
+        <p style="color: #a0aec0; font-size: 0.9rem;">Data masuk ke tabel: <code>api_key</code></p>
+        
+        <button id="genBtn" class="btn-blue">Generate New API Key</button>
+        
+        <div style="margin-top: 15px;">
+            <label>Result Key:</label>
+            <input type="text" id="apiKeyOutput" readonly placeholder="Klik tombol di atas...">
+        </div>
+        <div id="apiMsg" class="message"></div>
+
+        <hr style="border-color: #4a5568; margin: 20px 0;">
+        
+        <label>Validasi Key:</label>
+        <input type="text" id="checkInput" placeholder="Tempel key di sini...">
+        <button id="checkBtn" class="btn-blue" style="background-color: #4299e1;">Cek Validitas</button>
+        <div id="checkMsg" class="message"></div>
+    </div>
+
+
+    <div class="admin-link">
+        <p>Apakah Anda Administrator?</p>
+        <a href="/admin">Masuk ke Halaman Admin</a>
+    </div>
+</div>
+
+<script>
+    // --- SCRIPT HANYA UNTUK API KEY & USER ---
+    function showMsg(elId, text, isError = false) {
+        const el = document.getElementById(elId);
+        el.textContent = text;
+        el.className = isError ? 'message error' : 'message success';
+        setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+
+    // API Key Logic
+    document.getElementById('genBtn').addEventListener('click', async () => {
+        const input = document.getElementById('apiKeyOutput');
+        input.value = "Loading...";
+        try {
+            const res = await fetch('/create', { method: 'POST' });
+            const data = await res.json();
+            if(res.ok) { input.value = data.apiKey; showMsg('apiMsg', 'Sukses!'); } 
+            else { input.value = ""; showMsg('apiMsg', data.error, true); }
+        } catch (e) { showMsg('apiMsg', 'Gagal koneksi', true); }
+    });
+
+    // Check Key Logic
+    document.getElementById('checkBtn').addEventListener('click', async () => {
+        const key = document.getElementById('checkInput').value;
+        try {
+            const res = await fetch('/check', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ apiKey: key })
+            });
+            const data = await res.json();
+            showMsg('checkMsg', data.message, !data.valid);
+        } catch (e) { showMsg('checkMsg', 'Gagal koneksi', true); }
+    });
+
+    // Register User Logic
+    document.getElementById('regUserBtn').addEventListener('click', async () => {
+        const payload = {
+            first_name: document.getElementById('uFirst').value,
+            last_name: document.getElementById('uLast').value,
+            email: document.getElementById('uEmail').value
+        };
+        try {
+            const res = await fetch('/register/user', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if(res.ok) { 
+                showMsg('userMsg', data.message); 
+                document.getElementById('uFirst').value = '';
+                document.getElementById('uLast').value = '';
+                document.getElementById('uEmail').value = '';
+            } else { showMsg('userMsg', data.error, true); }
+        } catch (e) { showMsg('userMsg', 'Error jaringan', true); }
+    });
+</script>
+
+</body>
+</html>

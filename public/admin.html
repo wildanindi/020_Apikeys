@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Registrasi</title>
+    <style>
+        /* Menggunakan style yang sama agar konsisten */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2d3748; /* Warna lebih gelap untuk membedakan admin */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 0;
+            margin: 0;
+        }
+        .container {
+            background-color: #1a202c;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 400px;
+            border-top: 4px solid #dd6b20; /* Aksen Orange untuk Admin */
+        }
+        h2 { border-bottom: 2px solid #4a5568; padding-bottom: 10px; margin-bottom: 20px; color: #dd6b20; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #cbd5e0; }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #4a5568;
+            background-color: #2d3748;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        input:focus { outline: none; border-color: #dd6b20; }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+        .btn-orange { background-color: #dd6b20; color: white; }
+        
+        .message {
+            margin-top: 10px; font-size: 0.9rem; padding: 10px; border-radius: 5px; display: none;
+        }
+        .success { background-color: #c6f6d5; color: #22543d; display: block; }
+        .error { background-color: #fed7d7; color: #822727; display: block; }
+        
+        .nav-link {
+            display: block; text-align: center; margin-top: 20px; color: #a0aec0; text-decoration: none;
+        }
+        .nav-link:hover { color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Panel Admin</h2>
+    <p style="color: #a0aec0; font-size: 0.9rem;">Registrasi Administrator Baru</p>
+
+    <label>Email Admin</label>
+    <input type="email" id="aEmail" placeholder="admin@system.com">
+    
+    <label>Password</label>
+    <input type="password" id="aPass" placeholder="Rahasia123">
+    
+    <button id="regAdminBtn" class="btn-orange">Daftar Admin</button>
+    <div id="adminMsg" class="message"></div>
+
+    <a href="/" class="nav-link">← Kembali ke Halaman Utama</a>
+</div>
+
+<script>
+    function showMsg(elId, text, isError = false) {
+        const el = document.getElementById(elId);
+        el.textContent = text;
+        el.className = isError ? 'message error' : 'message success';
+        setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+
+    document.getElementById('regAdminBtn').addEventListener('click', async () => {
+        const payload = {
+            email: document.getElementById('aEmail').value,
+            password: document.getElementById('aPass').value
+        };
+
+        try {
+            // Fetch ke endpoint backend yang sudah kita pisah di routes/admin.js
+            const res = await fetch('/register/admin', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            
+            if(res.ok) {
+                showMsg('adminMsg', data.message);
+                document.getElementById('aEmail').value = '';
+                document.getElementById('aPass').value = '';
+            } else {
+                showMsg('adminMsg', data.error, true);
+            }
+        } catch (e) {
+            showMsg('adminMsg', 'Error jaringan', true);
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -5,15 +5,13 @@ const mysql = require('mysql2');
 const app = express();
 const port = 3000;
 
-// ==========================================
-// 1. KONFIGURASI KONEKSI DATABASE
-// ==========================================
+
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    port: 3308,               // Port MySQL Anda
-    password: 'Semogaditerima123', // Password Database Anda
-    database: 'apikey'        // Nama Database
+    port: 3308,               
+    password: 'Semogaditerima123', 
+    database: 'apikey'        
 });
 
 db.connect((err) => {
@@ -40,11 +38,8 @@ try {
 }
 
 
-// ==========================================
-// 3. ROUTE HALAMAN WEB (HTML)
-// ==========================================
 
-// Halaman Utama (User & API Key) -> http://localhost:3000/
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

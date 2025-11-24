@@ -114,35 +114,26 @@
         setTimeout(() => { el.style.display = 'none'; }, 5000);
     }
 
-    // --- LOGIC BARU: Login Admin ---
-    document.getElementById('loginAdminBtn').addEventListener('click', async () => {
-        const payload = {
-            email: document.getElementById('lEmail').value,
-            password: document.getElementById('lPass').value
-        };
+    // --- LOGIC BARU: Login Admin (DISESUAIKAN UNTUK PENGUJIAN REDIRECT) ---
+    document.getElementById('loginAdminBtn').addEventListener('click', () => {
+        const email = document.getElementById('lEmail').value;
+        const pass = document.getElementById('lPass').value;
 
-        try {
-            // Asumsi endpoint login adalah '/login/admin'
-            const res = await fetch('/login/admin', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            
-            if(res.ok && data.success) {
-                // Jika login sukses, arahkan ke dashboard
-                showMsg('loginMsg', 'Login Berhasil! Mengarahkan...', false);
-                // Redirect ke dashboard.html setelah jeda singkat
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-            } else {
-                showMsg('loginMsg', data.error || 'Email atau Password salah.', true);
-            }
-        } catch (e) {
-            showMsg('loginMsg', 'Error jaringan saat login', true);
+        if (!email || !pass) {
+            showMsg('loginMsg', 'Email dan Password wajib diisi.', true);
+            return;
         }
+
+        // --- SIMULASI SUKSES LOGIN & REDIRECT ---
+        // PENTING: Dalam aplikasi nyata dengan backend, Anda harus MENGGUNAKAN fetch 
+        // dan melakukan redirect hanya setelah respons API sukses.
+        
+        showMsg('loginMsg', 'Login Berhasil (Simulasi)! Mengarahkan ke Dashboard...', false);
+        
+        // Langsung arahkan ke dashboard.html setelah jeda singkat (1 detik)
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 1000); 
     });
 
     // --- LOGIC ASLI: Registrasi Admin ---
